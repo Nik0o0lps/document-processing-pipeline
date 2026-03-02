@@ -6,7 +6,7 @@ Este guia é para usuários Windows que precisam executar os comandos do projeto
 
 O comando `make` é uma ferramenta Unix/Linux. No Windows, use a alternativa fornecida.
 
-## ✅ Solução: Use `make.bat`
+##  Solução: Use `make.bat`
 
 ### Comandos Disponíveis
 
