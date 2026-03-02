@@ -2,82 +2,317 @@
 
 ## Arquitetura Detalhada
 
-### Fluxo de Dados
+### Fluxo de Dados Completo
 
+```mermaid
+flowchart TD
+    Start(["🚀 Início"])
+    
+    subgraph CLI["🖥️ Interface CLI (main.py)"]
+        Args["Parse Argumentos<br/>--directory, --max-workers"]:::cliNode
+        Env["Carrega .env<br/>GROQ_API_KEY / OPENAI_API_KEY"]:::cliNode
+        Val["Valida Configuração"]:::cliNode
+        Args --> Env --> Val
+    end
+    
+    subgraph Pipeline["📦 Pipeline (pipeline.py)"]
+        List["🔍 Listar PDFs<br/>glob('*.pdf')"]:::pipelineNode
+        Batch["⚡ ThreadPoolExecutor<br/>workers=3"]:::pipelineNode
+        Thread1["Thread 1"]:::threadNode
+        Thread2["Thread 2"]:::threadNode
+        Thread3["Thread 3"]:::threadNode
+        List --> Batch
+        Batch --> Thread1 & Thread2 & Thread3
+    end
+    
+    subgraph Processor["🔧 Document Processor"]
+        Extract["📖 Extração de Texto"]:::processNode
+        Try1["1️⃣ pdfplumber"]:::methodNode
+        Try2["2️⃣ PyPDF2"]:::methodNode
+        Try3["3️⃣ Tesseract OCR"]:::methodNode
+        Extract --> Try1
+        Try1 -."falha".-> Try2
+        Try2 -."falha".-> Try3
+    end
+    
+    subgraph LLM["🧠 LLM Client"]
+        Retry["🔄 Retry System<br/>Exponential Backoff<br/>5 tentativas"]:::retryNode
+        RateLimit["⏱️ Rate Limiter<br/>30 RPM"]:::rateLimitNode
+        Classify["📝 Classificação<br/>tipo + confiança"]:::llmNode
+        Extract2["📊 Extração<br/>dados estruturados"]:::llmNode
+        
+        Retry --> RateLimit
+        RateLimit --> Classify
+        RateLimit --> Extract2
+    end
+    
+    subgraph Validation["✅ Validação (Pydantic)"]
+        Schema1["NotaFiscal"]:::schemaNode
+        Schema2["Contrato"]:::schemaNode
+        Schema3["RelatorioManutencao"]:::schemaNode
+    end
+    
+    subgraph Storage["💾 Persistência"]
+        JSON1["📄 JSON Consolidado<br/>output/json/todos_documentos.json"]:::storageNode
+        JSON2["📑 JSON por Tipo<br/>output/json/notas_fiscais.json"]:::storageNode
+        CSV1["📊 CSV Resumo<br/>output/csv/resumo.csv"]:::storageNode
+        Stats["📈 Estatísticas<br/>output/relatorios/stats.txt"]:::storageNode
+    end
+    
+    Start --> CLI
+    CLI --> Pipeline
+    Thread1 & Thread2 & Thread3 --> Processor
+    Processor --> LLM
+    Classify --> Validation
+    Extract2 --> Validation
+    Validation --> Schema1 & Schema2 & Schema3
+    Schema1 & Schema2 & Schema3 --> Storage
+    Storage --> JSON1 & JSON2 & CSV1 & Stats
+    
+    classDef cliNode fill:#e3f2fd,stroke:#1976d2,stroke-width:2px,color:#000
+    classDef pipelineNode fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000
+    classDef threadNode fill:#fce4ec,stroke:#c2185b,stroke-width:1px,color:#000
+    classDef processNode fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#000
+    classDef methodNode fill:#fff9c4,stroke:#f9a825,stroke-width:1px,color:#000
+    classDef retryNode fill:#ffebee,stroke:#d32f2f,stroke-width:2px,color:#000
+    classDef rateLimitNode fill:#e0f2f1,stroke:#00796b,stroke-width:2px,color:#000
+    classDef llmNode fill:#fff3e0,stroke:#ff6f00,stroke-width:3px,color:#000
+    classDef schemaNode fill:#e8f5e9,stroke:#388e3c,stroke-width:2px,color:#000
+    classDef storageNode fill:#e0f7fa,stroke:#00838f,stroke-width:2px,color:#000
 ```
 
-                         ENTRADA                              
-  Documentos_Internos/                                        
-   001_pjpo.pdf                                           
-   002_6qvg.pdf                                           
-   ...                                                     
+### Diagrama de Componentes
 
-                  
-                  
+```mermaid
+graph LR
+    subgraph External["🌐 Serviços Externos"]
+        Groq["🤖 Groq Cloud<br/>llama-3.3-70b<br/>FREE"]:::groqNode
+        OpenAI["🧠 OpenAI<br/>gpt-4o-mini<br/>PAID"]:::openaiNode
+    end
+    
+    subgraph Core["⚙️ Core Application"]
+        Main["main.py<br/>CLI Entry"]:::mainNode
+        Pipe["pipeline.py<br/>Orchestration"]:::pipeNode
+        DocProc["document_processor.py<br/>PDF Processing"]:::docNode
+        LLMClient["llm_client.py<br/>AI Integration"]:::llmNode
+        Schemas["schemas.py<br/>Data Models"]:::schemaNode
+        Config["config.py<br/>Settings"]:::configNode
+    end
+    
+    subgraph Data["📂 Data Layer"]
+        Input["data/raw/<br/>Input PDFs"]:::inputNode
+        Output["output/<br/>Processed Data"]:::outputNode
+    end
+    
+    Main --> Config
+    Main --> Pipe
+    Pipe --> DocProc
+    DocProc --> LLMClient
+    LLMClient --> Groq
+    LLMClient --> OpenAI
+    LLMClient --> Schemas
+    Input --> DocProc
+    Schemas --> Output
+    
+    classDef groqNode fill:#c8e6c9,stroke:#388e3c,stroke-width:3px,color:#000
+    classDef openaiNode fill:#bbdefb,stroke:#1976d2,stroke-width:3px,color:#000
+    classDef mainNode fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#000
+    classDef pipeNode fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000
+    classDef docNode fill:#e1bee7,stroke:#8e24aa,stroke-width:2px,color:#000
+    classDef llmNode fill:#ffccbc,stroke:#e64a19,stroke-width:3px,color:#000
+    classDef schemaNode fill:#e8f5e9,stroke:#388e3c,stroke-width:2px,color:#000
+    classDef configNode fill:#e0f2f1,stroke:#00796b,stroke-width:2px,color:#000
+    classDef inputNode fill:#fce4ec,stroke:#c2185b,stroke-width:2px,color:#000
+    classDef outputNode fill:#e0f7fa,stroke:#00838f,stroke-width:2px,color:#000
+```
 
-                    MAIN.PY (Entrada)                         
-  - Parse argumentos CLI                                      
-  - Configura logging                                         
-  - Carrega .env                                              
-  - Valida configuração                                       
+### Sequência de Processamento (1 Documento)
 
-                  
-                  
+```mermaid
+sequenceDiagram
+    autonumber
+    participant U as 👤 Usuário
+    participant M as 📋 main.py
+    participant P as ⚙️ Pipeline
+    participant D as 🔧 DocProcessor
+    participant L as 🧠 LLM Client
+    participant G as 🤖 Groq API
+    participant V as ✅ Pydantic
+    participant S as 💾 Storage
+    
+    U->>M: python main.py --directory data/raw
+    activate M
+    M->>M: Parse args + Load .env
+    M->>P: processar_documentos()
+    activate P
+    
+    P->>P: Listar PDFs (glob *.pdf)
+    P->>P: ThreadPoolExecutor (3 workers)
+    
+    par Thread 1
+        P->>D: processar_documento(doc1.pdf)
+        activate D
+        
+        rect rgb(240, 240, 255)
+            Note over D: Extração de Texto
+            D->>D: pdfplumber.open()
+            alt pdfplumber sucesso
+                D->>D: texto extraído ✓
+            else pdfplumber falha
+                D->>D: PyPDF2.PdfReader()
+                alt PyPDF2 sucesso
+                    D->>D: texto extraído ✓
+                else PyPDF2 falha
+                    D->>D: Tesseract OCR
+                    D->>D: texto extraído ✓
+                end
+            end
+        end
+        
+        rect rgb(255, 250, 240)
+            Note over D,L: Classificação
+            D->>L: classificar_documento(texto)
+            activate L
+            L->>L: Retry wrapper ativado
+            L->>L: Rate limiter check (30 RPM)
+            L->>G: POST /chat/completions
+            activate G
+            G-->>L: {tipo: "nota_fiscal", confiança: 0.95}
+            deactivate G
+            L-->>D: DocumentoClassificado
+            deactivate L
+        end
+        
+        rect rgb(240, 255, 240)
+            Note over D,L: Extração
+            D->>L: extrair_informacoes(texto, "nota_fiscal")
+            activate L
+            L->>L: Rate limiter check
+            L->>G: POST /chat/completions (structured output)
+            activate G
+            G-->>L: {fornecedor: "...", cnpj: "...", valor: 1500.00}
+            deactivate G
+            L-->>D: dados dict
+            deactivate L
+        end
+        
+        rect rgb(240, 255, 240)
+            Note over D,V: Validação
+            D->>V: NotaFiscal.model_validate(dados)
+            activate V
+            V->>V: Validar tipos + constraints
+            V-->>D: NotaFiscal object ✓
+            deactivate V
+        end
+        
+        D-->>P: ProcessingResult(status="success")
+        deactivate D
+    end
+    
+    P->>P: Aguardar todas threads
+    
+    rect rgb(230, 245, 255)
+        Note over P,S: Persistência
+        P->>S: salvar_json(resultados)
+        P->>S: salvar_csv(resumo)
+        P->>S: gerar_estatisticas()
+        S-->>P: Arquivos salvos ✓
+    end
+    
+    P-->>M: Relatório completo
+    deactivate P
+    M-->>U: ✅ 24/50 processados com sucesso
+    deactivate M
+```
 
-              PIPELINE.PY (Orquestração)                      
-                                                              
-  1. listar_arquivos_pdf()                                   
-     > Glob pattern: *.pdf                                 
-                                                              
-  2. processar_lote() [ThreadPoolExecutor]                   
-     > Thread 1: documento_1.pdf                           
-     > Thread 2: documento_2.pdf                           
-     > Thread 3: documento_3.pdf                           
-                                                              
-  3. salvar_resultados()                                     
-     > JSON consolidado                                    
-     > JSONs por tipo                                      
-     > CSV resumo                                          
-     > Estatísticas TXT                                    
+### Fluxo de Retry e Rate Limiting
 
-                  
-                  
+```mermaid
+stateDiagram-v2
+    [*] --> CheckRateLimit: Request LLM
+    
+    CheckRateLimit --> Wait: RPM excedido
+    Wait --> MakeRequest: Aguardou tempo necessário
+    CheckRateLimit --> MakeRequest: RPM OK
+    
+    MakeRequest --> Success: 200 OK
+    MakeRequest --> RateLimitError: 429 Rate Limit
+    MakeRequest --> OtherError: 5xx Server Error
+    
+    RateLimitError --> Retry1: Tentativa 1 (wait 1s)
+    Retry1 --> MakeRequest
+    
+    RateLimitError --> Retry2: Tentativa 2 (wait 2s)
+    Retry2 --> MakeRequest
+    
+    RateLimitError --> Retry3: Tentativa 3 (wait 4s)
+    Retry3 --> MakeRequest
+    
+    RateLimitError --> Retry4: Tentativa 4 (wait 8s)
+    Retry4 --> MakeRequest
+    
+    RateLimitError --> Retry5: Tentativa 5 (wait 16s)
+    Retry5 --> MakeRequest
+    
+    RateLimitError --> Failed: 5 tentativas esgotadas
+    OtherError --> Failed
+    
+    Success --> [*]
+    Failed --> [*]
+    
+    note right of CheckRateLimit
+        Rate Limiter Preventivo
+        Track: requests + timestamps
+        Limite: 30 req/min
+    end note
+    
+    note right of RateLimitError
+        Exponential Backoff
+        Base: 1 segundo
+        Multiplicador: 2x
+        Max tentativas: 5
+    end note
+```
 
-         DOCUMENT_PROCESSOR.PY (Processamento)                
-                                                              
-  processar_documento()                                       
-                                                             
-    > 1. extrair_texto_pdf()                              
-        > Tentativa 1: pdfplumber                        
-        > Tentativa 2: PyPDF2 (fallback)                 
-                                                             
-    > 2. LLM: classificar_documento()                     
-        > Retorna: tipo + confiança                      
-                                                             
-    > 3. LLM: extrair_informacoes()                       
-         > Retorna: dados estruturados                     
+### Diagrama de Estados do Documento
 
-                  
-                  
-
-           LLM_CLIENT.PY (Interação com API)                  
-                                                              
-  OpenAI API (gpt-4o-mini)                                   
-                                                             
-    > classificar_documento()                             
-        Request:                                            
-          - System prompt: "Você é especialista..."        
-          - User prompt: texto + instruções                
-          - Response format: DocumentoClassificado         
-          - Temperature: 0.1                                
-        Response:                                           
-          - tipo: "nota_fiscal" | "contrato" | ...         
-          - confianca: 0.95                                 
-                                                             
-    > extrair_informacoes()                               
-         Request:                                            
-           - System prompt: "Você é especialista..."        
-           - User prompt: texto + instruções específicas    
+```mermaid
+stateDiagram-v2
+    [*] --> Pending: PDF detectado
+    
+    Pending --> Extracting: Iniciar processamento
+    
+    Extracting --> Classifying: Texto extraído
+    Extracting --> Failed: Erro extração (3 tentativas)
+    
+    Classifying --> Extracting_Data: Tipo identificado
+    Classifying --> Failed: Erro classificação
+    
+    Extracting_Data --> Validating: Dados extraídos
+    Extracting_Data --> Retry: Rate limit (retry)
+    Extracting_Data --> Failed: Erro extração dados
+    
+    Retry --> Extracting_Data: Após backoff
+    
+    Validating --> Success: Pydantic OK
+    Validating --> Failed: Validação falhou
+    
+    Success --> [*]: JSON/CSV salvos
+    Failed --> [*]: Log de erro
+    
+    note right of Extracting
+        Estratégias:
+        1. pdfplumber
+        2. PyPDF2
+        3. Tesseract OCR
+    end note
+    
+    note right of Extracting_Data
+        Retry automático
+        com exponential
+        backoff
+    end note
+```    
            - Response format: NotaFiscal | Contrato | ...   
            - Temperature: 0                                  
          Response:                                           

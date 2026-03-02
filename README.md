@@ -45,38 +45,54 @@ Para detalhes técnicos do sistema de rate limiting, veja [RATE_LIMITING.md](RAT
 
 ## Arquitetura da Solução
 
-```
+```mermaid
+graph TB
+    subgraph Input["📁 Camada de Entrada"]
+        PDF["📄 Documentos PDF<br/>(data/raw/)"]:::inputNode
+    end
 
-  Documentos PDF 
-  (Entrada)      
+    subgraph Processing["⚙️ Camada de Processamento"]
+        DP["🔍 Document Processor<br/><br/>Extração de Texto"]:::processingNode
+        PDF1["pdfplumber"]:::toolNode
+        PDF2["PyPDF2 fallback"]:::toolNode
+        OCR["Tesseract OCR"]:::toolNode
+        DP --> PDF1
+        PDF1 -.-> PDF2
+        PDF2 -.-> OCR
+    end
 
-         
-         v
+    subgraph Intelligence["🤖 Camada de Inteligência"]
+        LLM["🧠 LLM Client<br/><br/>Groq / OpenAI"]:::llmNode
+        CLS["Classificação<br/>nota_fiscal | contrato | relatorio"]:::aiNode
+        EXT["Extração Estruturada<br/>Campos específicos"]:::aiNode
+        LLM --> CLS
+        LLM --> EXT
+    end
 
-        Document Processor              
-    
-    Extração de Texto                 
-    (pdfplumber + PyPDF2)             
-    
-                 v                       
-    
-    LLM Client (OpenAI)               
-    - Classificação                   
-    - Extração Estruturada            
-    
+    subgraph Validation["✅ Camada de Validação"]
+        PYD["📋 Pydantic Schemas<br/><br/>Validação de Tipos"]:::validationNode
+    end
 
-                  v
-         
-          Validação      
-          (Pydantic)     
-         
-                 v
-         
-          Persistência      
-          - JSON            
-          - CSV             
-          - Relatórios      
-         
+    subgraph Output["💾 Camada de Saída"]
+        JSON["📦 output/json/<br/>Documentos estruturados"]:::outputNode
+        CSV["📊 output/csv/<br/>Tabelas resumidas"]:::outputNode
+        RPT["📈 output/relatorios/<br/>Estatísticas"]:::outputNode
+    end
+
+    PDF --> DP
+    DP --> LLM
+    LLM --> PYD
+    PYD --> JSON
+    PYD --> CSV
+    PYD --> RPT
+
+    classDef inputNode fill:#e3f2fd,stroke:#1976d2,stroke-width:3px,color:#000
+    classDef processingNode fill:#f3e5f5,stroke:#7b1fa2,stroke-width:3px,color:#000
+    classDef toolNode fill:#fce4ec,stroke:#c2185b,stroke-width:2px,color:#000
+    classDef llmNode fill:#fff3e0,stroke:#f57c00,stroke-width:3px,color:#000
+    classDef aiNode fill:#fff9c4,stroke:#f9a825,stroke-width:2px,color:#000
+    classDef validationNode fill:#e8f5e9,stroke:#388e3c,stroke-width:3px,color:#000
+    classDef outputNode fill:#e0f7fa,stroke:#00838f,stroke-width:2px,color:#000
 ```
 
 ### Componentes Principais
