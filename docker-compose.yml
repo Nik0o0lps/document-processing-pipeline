@@ -1,0 +1,48 @@
+# Docker Compose para Document Processing Pipeline
+
+version: '3.8'
+
+services:
+  pipeline:
+    build: .
+    container_name: document-pipeline
+    image: document-pipeline:latest
+    
+    # Variáveis de ambiente (usa .env do host)
+    env_file:
+      - .env
+    
+    # Volumes para persistência
+    volumes:
+      - ./data:/app/data           # PDFs de entrada
+      - ./output:/app/output       # Resultados
+      - ./logs:/app/logs           # Logs (opcional)
+    
+    # Configurações
+    restart: unless-stopped
+    
+    # Comando customizado (override do Dockerfile)
+    command: ["--input-dir", "data/raw", "--output-dir", "output", "--log-level", "INFO"]
+    
+    # Limites de recursos (opcional)
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '1'
+          memory: 1G
+
+  # Serviço para rodar testes (opcional)
+  test:
+    build: .
+    container_name: document-pipeline-test
+    env_file:
+      - .env
+    volumes:
+      - ./tests:/app/tests
+      - ./src:/app/src
+    command: ["pytest", "tests/", "-v", "--cov=src"]
+    profiles:
+      - test

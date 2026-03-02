@@ -1,0 +1,33 @@
+# Core dependencies
+python-dotenv==1.0.0
+pydantic==2.5.0
+
+# LLM providers (escolha um ou ambos)
+openai==1.12.0
+groq==0.4.2
+
+# PDF processing
+pypdf2==3.0.1
+pdfplumber==0.10.3
+pdf2image==1.16.3
+pytesseract==0.3.10
+Pillow==10.1.0
+
+# Data handling
+pandas==2.1.4
+
+# Progress bar
+tqdm==4.66.1
+
+# Logging
+colorlog==6.8.0
+
+# Testing (development)
+pytest==9.0.2
+pytest-cov==7.0.0
+pytest-mock==3.15.1
+
+# Code quality (development)
+black==24.3.0
+isort==5.13.2
+flake8==7.0.0

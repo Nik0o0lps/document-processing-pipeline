@@ -1,0 +1,55 @@
+# Ignorar arquivos desnecessários no build Docker
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# CI/CD
+.github/
+
+# Ambientes Python
+venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Testes e cobertura
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Dados locais (não incluir no container)
+output/
+logs/
+*.log
+
+# Documentação de desenvolvimento
+*.md
+!README.md
+CONTRIBUTING.md
+ARCHITECTURE.md
+TROUBLESHOOTING.md
+
+# Configuração local
+.env
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# OS
+.DS_Store
+Thumbs.db
