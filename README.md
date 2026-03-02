@@ -1,6 +1,6 @@
 # Pipeline de Processamento de Documentos com LLM
 
-[![Python](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Python](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-pytest-orange.svg)](tests/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
@@ -171,7 +171,7 @@ graph TB
 ## Instalação
 
 ### Pré-requisitos
-- Python 3.8 ou superior
+- Python 3.10 ou superior (desenvolvido em 3.11)
 - pip (gerenciador de pacotes Python)
 - Conta OpenAI com API key
 
@@ -677,7 +677,7 @@ O projeto inclui:
 ### CI/CD
 
 GitHub Actions executam automaticamente em cada push/PR:
-- Testes em Python 3.8, 3.9, 3.10, 3.11
+- Testes em Python 3.10, 3.11
 - Testes em Ubuntu e Windows
 - Lint com flake8
 - Security scan com bandit
