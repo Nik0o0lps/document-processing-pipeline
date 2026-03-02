@@ -40,6 +40,12 @@ output/
 logs/
 *.log
 
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+coverage.xml
+
 # Data (descomente se não quiser versionar os documentos)
 # data/raw/*.pdf
 
