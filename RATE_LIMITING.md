@@ -30,7 +30,7 @@ Tentativa 2 → Rate Limit → Aguarda 2s
 Tentativa 3 → Rate Limit → Aguarda 4s
 Tentativa 4 → Rate Limit → Aguarda 8s
 Tentativa 5 → Rate Limit → Aguarda 16s
-Tentativa 6 → ❌ Erro final (após 31s tentando)
+Tentativa 6 →  Erro final (após 31s tentando)
 ```
 
 **Detecção Inteligente:**
@@ -57,9 +57,9 @@ def _wait_if_rate_limited(self):
 **Exemplo:**
 
 ```
-Requisição 1-29: ✅ Processa imediatamente
-Requisição 30:   ⏸️ Aguarda 15s (até janela de 1min liberar)
-Requisição 31:   ✅ Processa imediatamente
+Requisição 1-29:  Processa imediatamente
+Requisição 30:    Aguarda 15s (até janela de 1min liberar)
+Requisição 31:    Processa imediatamente
 ```
 
 **Janela Deslizante:**
@@ -107,9 +107,9 @@ client = LLMClient(
 
 | Config | Rate Limiter | Retries | Tempo | Taxa Sucesso |
 |--------|--------------|---------|-------|--------------|
-| Groq Free | ✅ Enabled (30 RPM) | 5 | ~23 dias | 95% |
-| OpenAI Tier 1 | ✅ Enabled (500 RPM) | 3 | ~33 horas | 98% |
-| OpenAI Tier 4 | ❌ Disabled | 2 | ~6 horas | 99.9% |
+| Groq Free |  Enabled (30 RPM) | 5 | ~23 dias | 95% |
+| OpenAI Tier 1 |  Enabled (500 RPM) | 3 | ~33 horas | 98% |
+| OpenAI Tier 4 |  Disabled | 2 | ~6 horas | 99.9% |
 
 ## Configurações Recomendadas
 
@@ -333,13 +333,13 @@ if response.headers['x-ratelimit-remaining'] < 10:
 
 ## Resumo
 
-✅ **Implementado:**
+ **Implementado:**
 - Retry automático com exponential backoff
 - Rate limiter preventivo com janela deslizante
 - Configuração personalizável por cenário
 - Logging detalhado para monitoramento
 
-🎯 **Resultados:**
+ **Resultados:**
 - Taxa de sucesso: 48% → 95%
 - Desperdício reduzido: 26 docs perdidos → 3
 - Configurável para qualquer provider/tier
