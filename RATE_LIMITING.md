@@ -344,7 +344,7 @@ if response.headers['x-ratelimit-remaining'] < 10:
 - Desperdício reduzido: 26 docs perdidos → 3
 - Configurável para qualquer provider/tier
 
-💡 **Recomendação:**
+ **Recomendação:**
 - **Groq Free:** Sempre use ambos (retry + limiter)
 - **OpenAI Tier 1-3:** Use ambos com limite ajustado
 - **OpenAI Tier 4+:** Apenas retry (desabilite limiter)
