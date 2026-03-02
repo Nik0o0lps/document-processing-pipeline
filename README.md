@@ -310,9 +310,9 @@ O sistema inclui retry automático e rate limiter preventivo que **aumenta a tax
 
 | Provider | Tier | enable_rate_limiter | requests_per_minute | max_retries |
 |----------|------|---------------------|---------------------|-------------|
-| Groq | Free | ✅ True | 30 | 5 |
-| OpenAI | Tier 1 | ✅ True | 500 | 3 |
-| OpenAI | Tier 4+ | ❌ False | N/A | 2 |
+| Groq | Free |  True | 30 | 5 |
+| OpenAI | Tier 1 |  True | 500 | 3 |
+| OpenAI | Tier 4+ |  False | N/A | 2 |
 
 **Personalização via código:**
 
@@ -585,11 +585,11 @@ docker-compose up
 
 ### Dockerfile Features
 
-- ✅ Imagem base Python 3.11-slim
-- ✅ Tesseract OCR + Poppler pré-instalados
-- ✅ Volumes para data/output
-- ✅ Healthcheck automático
-- ✅ Multi-stage build (otimizado)
+-  Imagem base Python 3.11-slim
+-  Tesseract OCR + Poppler pré-instalados
+-  Volumes para data/output
+-  Healthcheck automático
+-  Multi-stage build (otimizado)
 
 ### Docker Compose
 
@@ -666,11 +666,11 @@ python -m pytest tests/ -v
 ### Cobertura de Testes
 
 O projeto inclui:
-- ✅ Testes unitários para schemas (Pydantic)
-- ✅ Testes unitários para LLM client (com mocks)
-- ✅ Testes unitários para document processor
-- ✅ Testes de integração end-to-end
-- ✅ GitHub Actions CI/CD automatizado
+-  Testes unitários para schemas (Pydantic)
+-  Testes unitários para LLM client (com mocks)
+-  Testes unitários para document processor
+-  Testes de integração end-to-end
+-  GitHub Actions CI/CD automatizado
 
 **Meta de cobertura:** >80%
 
