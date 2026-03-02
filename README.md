@@ -47,12 +47,12 @@ Para detalhes técnicos do sistema de rate limiting, veja [RATE_LIMITING.md](RAT
 
 ```mermaid
 graph TB
-    subgraph Input["📁 Camada de Entrada"]
-        PDF["📄 Documentos PDF<br/>(data/raw/)"]:::inputNode
+    subgraph Input["Camada de Entrada"]
+        PDF["Documentos PDF<br/>(data/raw/)"]:::inputNode
     end
 
-    subgraph Processing["⚙️ Camada de Processamento"]
-        DP["🔍 Document Processor<br/><br/>Extração de Texto"]:::processingNode
+    subgraph Processing["Camada de Processamento"]
+        DP["Document Processor<br/><br/>Extração de Texto"]:::processingNode
         PDF1["pdfplumber"]:::toolNode
         PDF2["PyPDF2 fallback"]:::toolNode
         OCR["Tesseract OCR"]:::toolNode
@@ -61,22 +61,22 @@ graph TB
         PDF2 -.-> OCR
     end
 
-    subgraph Intelligence["🤖 Camada de Inteligência"]
-        LLM["🧠 LLM Client<br/><br/>Groq / OpenAI"]:::llmNode
+    subgraph Intelligence["Camada de Inteligência"]
+        LLM["LLM Client<br/><br/>Groq / OpenAI"]:::llmNode
         CLS["Classificação<br/>nota_fiscal | contrato | relatorio"]:::aiNode
         EXT["Extração Estruturada<br/>Campos específicos"]:::aiNode
         LLM --> CLS
         LLM --> EXT
     end
 
-    subgraph Validation["✅ Camada de Validação"]
-        PYD["📋 Pydantic Schemas<br/><br/>Validação de Tipos"]:::validationNode
+    subgraph Validation["Camada de Validação"]
+        PYD["Pydantic Schemas<br/><br/>Validação de Tipos"]:::validationNode
     end
 
-    subgraph Output["💾 Camada de Saída"]
-        JSON["📦 output/json/<br/>Documentos estruturados"]:::outputNode
-        CSV["📊 output/csv/<br/>Tabelas resumidas"]:::outputNode
-        RPT["📈 output/relatorios/<br/>Estatísticas"]:::outputNode
+    subgraph Output["Camada de Saída"]
+        JSON["output/json/<br/>Documentos estruturados"]:::outputNode
+        CSV["output/csv/<br/>Tabelas resumidas"]:::outputNode
+        RPT["output/relatorios/<br/>Estatísticas"]:::outputNode
     end
 
     PDF --> DP

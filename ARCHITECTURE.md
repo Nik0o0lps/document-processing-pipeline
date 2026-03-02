@@ -6,18 +6,18 @@
 
 ```mermaid
 flowchart TD
-    Start(["🚀 Início"])
+    Start(["Início"])
     
-    subgraph CLI["🖥️ Interface CLI (main.py)"]
+    subgraph CLI["Interface CLI (main.py)"]
         Args["Parse Argumentos<br/>--directory, --max-workers"]:::cliNode
         Env["Carrega .env<br/>GROQ_API_KEY / OPENAI_API_KEY"]:::cliNode
         Val["Valida Configuração"]:::cliNode
         Args --> Env --> Val
     end
     
-    subgraph Pipeline["📦 Pipeline (pipeline.py)"]
-        List["🔍 Listar PDFs<br/>glob('*.pdf')"]:::pipelineNode
-        Batch["⚡ ThreadPoolExecutor<br/>workers=3"]:::pipelineNode
+    subgraph Pipeline["Pipeline (pipeline.py)"]
+        List["Listar PDFs<br/>glob('*.pdf')"]:::pipelineNode
+        Batch["ThreadPoolExecutor<br/>workers=3"]:::pipelineNode
         Thread1["Thread 1"]:::threadNode
         Thread2["Thread 2"]:::threadNode
         Thread3["Thread 3"]:::threadNode
@@ -25,38 +25,38 @@ flowchart TD
         Batch --> Thread1 & Thread2 & Thread3
     end
     
-    subgraph Processor["🔧 Document Processor"]
-        Extract["📖 Extração de Texto"]:::processNode
-        Try1["1️⃣ pdfplumber"]:::methodNode
-        Try2["2️⃣ PyPDF2"]:::methodNode
-        Try3["3️⃣ Tesseract OCR"]:::methodNode
+    subgraph Processor["Document Processor"]
+        Extract["Extração de Texto"]:::processNode
+        Try1["Step 1: pdfplumber"]:::methodNode
+        Try2["Step 2: PyPDF2"]:::methodNode
+        Try3["Step 3: Tesseract OCR"]:::methodNode
         Extract --> Try1
         Try1 -."falha".-> Try2
         Try2 -."falha".-> Try3
     end
     
-    subgraph LLM["🧠 LLM Client"]
-        Retry["🔄 Retry System<br/>Exponential Backoff<br/>5 tentativas"]:::retryNode
-        RateLimit["⏱️ Rate Limiter<br/>30 RPM"]:::rateLimitNode
-        Classify["📝 Classificação<br/>tipo + confiança"]:::llmNode
-        Extract2["📊 Extração<br/>dados estruturados"]:::llmNode
+    subgraph LLM["LLM Client"]
+        Retry["Retry System<br/>Exponential Backoff<br/>5 tentativas"]:::retryNode
+        RateLimit["Rate Limiter<br/>30 RPM"]:::rateLimitNode
+        Classify["Classificação<br/>tipo + confiança"]:::llmNode
+        Extract2["Extração<br/>dados estruturados"]:::llmNode
         
         Retry --> RateLimit
         RateLimit --> Classify
         RateLimit --> Extract2
     end
     
-    subgraph Validation["✅ Validação (Pydantic)"]
+    subgraph Validation["Validação (Pydantic)"]
         Schema1["NotaFiscal"]:::schemaNode
         Schema2["Contrato"]:::schemaNode
         Schema3["RelatorioManutencao"]:::schemaNode
     end
     
-    subgraph Storage["💾 Persistência"]
-        JSON1["📄 JSON Consolidado<br/>output/json/todos_documentos.json"]:::storageNode
-        JSON2["📑 JSON por Tipo<br/>output/json/notas_fiscais.json"]:::storageNode
-        CSV1["📊 CSV Resumo<br/>output/csv/resumo.csv"]:::storageNode
-        Stats["📈 Estatísticas<br/>output/relatorios/stats.txt"]:::storageNode
+    subgraph Storage["Persistência"]
+        JSON1["JSON Consolidado<br/>output/json/todos_documentos.json"]:::storageNode
+        JSON2["JSON por Tipo<br/>output/json/notas_fiscais.json"]:::storageNode
+        CSV1["CSV Resumo<br/>output/csv/resumo.csv"]:::storageNode
+        Stats["Estatísticas<br/>output/relatorios/stats.txt"]:::storageNode
     end
     
     Start --> CLI
@@ -85,12 +85,12 @@ flowchart TD
 
 ```mermaid
 graph LR
-    subgraph External["🌐 Serviços Externos"]
-        Groq["🤖 Groq Cloud<br/>llama-3.3-70b<br/>FREE"]:::groqNode
-        OpenAI["🧠 OpenAI<br/>gpt-4o-mini<br/>PAID"]:::openaiNode
+    subgraph External["Serviços Externos"]
+        Groq["Groq Cloud<br/>llama-3.3-70b<br/>FREE"]:::groqNode
+        OpenAI["OpenAI<br/>gpt-4o-mini<br/>PAID"]:::openaiNode
     end
     
-    subgraph Core["⚙️ Core Application"]
+    subgraph Core["Core Application"]
         Main["main.py<br/>CLI Entry"]:::mainNode
         Pipe["pipeline.py<br/>Orchestration"]:::pipeNode
         DocProc["document_processor.py<br/>PDF Processing"]:::docNode
@@ -99,7 +99,7 @@ graph LR
         Config["config.py<br/>Settings"]:::configNode
     end
     
-    subgraph Data["📂 Data Layer"]
+    subgraph Data["Data Layer"]
         Input["data/raw/<br/>Input PDFs"]:::inputNode
         Output["output/<br/>Processed Data"]:::outputNode
     end
@@ -131,14 +131,14 @@ graph LR
 ```mermaid
 sequenceDiagram
     autonumber
-    participant U as 👤 Usuário
-    participant M as 📋 main.py
-    participant P as ⚙️ Pipeline
-    participant D as 🔧 DocProcessor
-    participant L as 🧠 LLM Client
-    participant G as 🤖 Groq API
-    participant V as ✅ Pydantic
-    participant S as 💾 Storage
+    participant U as Usuário
+    participant M as main.py
+    participant P as Pipeline
+    participant D as DocProcessor
+    participant L as LLM Client
+    participant G as Groq API
+    participant V as Pydantic
+    participant S as Storage
     
     U->>M: python main.py --directory data/raw
     activate M
@@ -216,12 +216,12 @@ sequenceDiagram
         P->>S: salvar_json(resultados)
         P->>S: salvar_csv(resumo)
         P->>S: gerar_estatisticas()
-        S-->>P: Arquivos salvos ✓
+        S-->>P: Arquivos salvos OK
     end
     
     P-->>M: Relatório completo
     deactivate P
-    M-->>U: ✅ 24/50 processados com sucesso
+    M-->>U: 24/50 processados com sucesso
     deactivate M
 ```
 
