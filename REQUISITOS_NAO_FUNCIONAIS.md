@@ -114,8 +114,8 @@ def classificar_documento(self, texto: str) -> DocumentoClassificado:
 
 | Cenário | Antes | Depois |
 |---------|-------|--------|
-| Rate limit temporário | ❌ Falha imediata | ✅ Retry automático |
-| 100 docs, 10 rate limits | ❌ 10 perdidos | ✅ ~9 recuperados |
+| Rate limit temporário |  Falha imediata |  Retry automático |
+| 100 docs, 10 rate limits |  10 perdidos |  ~9 recuperados |
 | Throughput | ~48% sucesso | ~95% sucesso |
 
 #### b) Rate Limiter Preventivo
@@ -251,10 +251,10 @@ Erros: ~3 (5% - erros persistentes)
 
 | Cenário | enable_rate_limiter | requests_per_minute | max_retries |
 |---------|---------------------|---------------------|-------------|
-| Groq Free Tier | ✅ True | 30 | 5 |
-| OpenAI Tier 1 | ✅ True | 500 | 3 |
-| OpenAI Tier 4+ | ❌ False | N/A | 2 |
-| Desenvolvimento/Debug | ❌ False | N/A | 0 |
+| Groq Free Tier |  True | 30 | 5 |
+| OpenAI Tier 1 |  True | 500 | 3 |
+| OpenAI Tier 4+ |  False | N/A | 2 |
+| Desenvolvimento/Debug |  False | N/A | 0 |
 
 **Importante:** Com retry automático + rate limiter preventivo, a taxa de sucesso sobe de ~48% para ~95%.
 
